@@ -1,7 +1,7 @@
 # 🚀 BillFlow SaaS | Plataforma de Facturación Disruptiva
 
 ![Vue.js](https://img.shields.io/badge/Vue.js-3.x-4fc08d?style=for-the-badge&logo=vue.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6?style=for-the-badge&logo=typescript)
+![TypeScript](https://img.shields.io/badge/TypeScript-6.x-3178c6?style=for-the-badge&logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38bdf8?style=for-the-badge&logo=tailwind-css)
 ![Status](https://img.shields.io/badge/Status-In_Development-orange?style=for-the-badge)
 
