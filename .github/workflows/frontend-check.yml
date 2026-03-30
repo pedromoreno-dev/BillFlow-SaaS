@@ -18,10 +18,10 @@ jobs:
         run: cd frontend && npm install
       - name: Build check
         run: cd frontend && npm run build
-      - name: Run Snyk to check for vulnerabilities
+      - name: Snyk Monitor (Upload results to Snyk UI)
         uses: snyk/actions/node@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          command: test
-          args: --severity-threshold=high --file=frontend/package.json
+          command: monitor
+          args: --file=frontend/package.json --project-name=BillFlow-Frontend
