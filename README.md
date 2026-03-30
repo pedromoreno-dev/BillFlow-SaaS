@@ -4,6 +4,8 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-6.x-3178c6?style=for-the-badge&logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-38bdf8?style=for-the-badge&logo=tailwind-css)
 ![Status](https://img.shields.io/badge/Status-In_Development-orange?style=for-the-badge)
+[![Snyk Vulnerability Scanner](https://snyk.io/test/github/pedromoreno-dev/BillFlow-SaaS/badge.svg)](https://app.snyk.io/org/pcmoreno11/project/203594a2-4c52-4a38-ad33-2e123f0a8fc5)
+![Frontend Check](https://github.com/pedromoreno-dev/BillFlow-SaaS/actions/workflows/frontend-check.yml/badge.svg)
 
 **BillFlow** es una solución SaaS de facturación multi-inquilino (B2B) diseñada con un enfoque disruptivo, priorizando la experiencia de usuario (UX) y la escalabilidad técnica. 
 
