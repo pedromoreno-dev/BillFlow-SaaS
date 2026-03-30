@@ -1,0 +1,27 @@
+name: Frontend Check
+
+on:
+  pull_request:
+    paths:
+      - 'frontend/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Install dependencies
+        run: cd frontend && npm install
+      - name: Build check
+        run: cd frontend && npm run build
+      - name: Snyk Monitor (Upload results to Snyk UI)
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+          args: --file=frontend/package.json --project-name=BillFlow-Frontend
