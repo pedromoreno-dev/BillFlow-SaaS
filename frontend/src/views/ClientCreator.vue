@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { reactive } from 'vue';
 import { 
   ArrowLeft, 
   Save, 
@@ -13,13 +13,38 @@ import {
   CreditCard,
   Plus
 } from 'lucide-vue-next';
-import { cn } from '../lib/utils';
+import { useStore } from '../composables/useStore';
+import CustomSelect from '../components/CustomSelect.vue';
 
 interface ClientCreatorProps {
   onBack: () => void;
 }
 
 const props = defineProps<ClientCreatorProps>();
+const store = useStore();
+
+const countryOptions = [
+  { value: 'España', label: 'España' },
+  { value: 'México', label: 'México' },
+  { value: 'Reino Unido', label: 'Reino Unido' },
+  { value: 'Alemania', label: 'Alemania' },
+  { value: 'Francia', label: 'Francia' },
+  { value: 'Estados Unidos', label: 'Estados Unidos' },
+];
+
+const paymentTermsOptions = [
+  { value: 'due', label: 'Al recibir' },
+  { value: 'net15', label: 'Net 15 días' },
+  { value: 'net30', label: 'Net 30 días' },
+  { value: 'net60', label: 'Net 60 días' },
+];
+
+const currencyOptions = [
+  { value: 'EUR', label: 'Euro (€)' },
+  { value: 'USD', label: 'Dólar Estadounidense ($)' },
+  { value: 'MXN', label: 'Peso Mexicano ($)' },
+  { value: 'GBP', label: 'Libra Esterlina (£)' },
+];
 
 const client = reactive({
   name: '',
@@ -30,13 +55,28 @@ const client = reactive({
   city: '',
   country: '',
   taxId: '',
+  location: '',
   paymentTerms: 'net30',
   currency: 'EUR',
   notes: ''
 });
 
 const handleSave = () => {
-  console.log('Saving client:', client);
+  if (!client.name || !client.email) {
+    alert('Por favor completa los campos requeridos');
+    return;
+  }
+
+  store.addClient({
+    name: client.name,
+    email: client.email,
+    phone: client.phone,
+    location: client.location || `${client.city}, ${client.country}`,
+    revenue: 0,
+    trend: 'up',
+    status: 'active'
+  });
+
   props.onBack();
 };
 </script>
@@ -44,7 +84,7 @@ const handleSave = () => {
 <template>
   <div class="max-w-5xl mx-auto py-6 pb-20">
     <!-- Header -->
-    <div class="flex justify-between items-center mb-10">
+    <div class="flex justify-between items-center mb-6 md:mb-10">
       <button 
         @click="onBack"
         class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group"
@@ -55,18 +95,18 @@ const handleSave = () => {
       
       <div class="text-right">
         <p class="text-secondary font-semibold tracking-widest text-xs uppercase mb-1">Nueva Relación</p>
-        <h2 class="font-headline text-3xl font-bold tracking-tight text-white">Agregar Cliente</h2>
+        <h2 class="font-headline text-2xl md:text-3xl font-bold tracking-tight text-white">Agregar Cliente</h2>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
       <!-- Main Form -->
-      <div class="lg:col-span-2 space-y-6">
+      <div class="lg:col-span-2 space-y-4 md:space-y-6">
         <!-- Basic Info -->
-        <div class="glass-panel p-8 rounded-[2rem] space-y-6">
+        <div class="glass-panel p-6 md:p-8 rounded-2xl md:rounded-[2rem] space-y-6">
           <h3 class="text-sm font-bold text-white uppercase tracking-widest mb-6">Información Básica</h3>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div class="space-y-2">
               <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                 <Building2 :size="14" />
@@ -119,10 +159,10 @@ const handleSave = () => {
         </div>
 
         <!-- Address -->
-        <div class="glass-panel p-8 rounded-[2rem] space-y-6">
+        <div class="glass-panel p-6 md:p-8 rounded-2xl md:rounded-[2rem] space-y-6">
           <h3 class="text-sm font-bold text-white uppercase tracking-widest mb-6">Ubicación y Dirección</h3>
           
-          <div class="space-y-6">
+          <div class="space-y-4 md:space-y-6">
             <div class="space-y-2">
               <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                 <MapPin :size="14" />
@@ -135,7 +175,7 @@ const handleSave = () => {
                 class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:ring-1 focus:ring-primary/50 transition-all"
               />
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <div class="space-y-2">
                 <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Ciudad</label>
                 <input 
@@ -147,55 +187,40 @@ const handleSave = () => {
               </div>
               <div class="space-y-2">
                 <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">País</label>
-                <select 
+                <CustomSelect 
+                  :options="countryOptions"
                   v-model="client.country"
-                  class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:ring-1 focus:ring-primary/50 transition-all appearance-none"
-                >
-                  <option value="" disabled>Seleccionar país...</option>
-                  <option value="España">España</option>
-                  <option value="México">México</option>
-                  <option value="Reino Unido">Reino Unido</option>
-                  <option value="Alemania">Alemania</option>
-                </select>
+                  placeholder="Seleccionar país..."
+                />
               </div>
             </div>
           </div>
         </div>
 
         <!-- Billing Terms -->
-        <div class="glass-panel p-8 rounded-[2rem] space-y-6">
+        <div class="glass-panel p-6 md:p-8 rounded-2xl md:rounded-[2rem] space-y-6">
           <h3 class="text-sm font-bold text-white uppercase tracking-widest mb-6">Condiciones de Pago</h3>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div class="space-y-2">
               <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                 <CreditCard :size="14" />
                 Plazo de Pago Predeterminado
               </label>
-              <select 
+              <CustomSelect 
+                :options="paymentTermsOptions"
                 v-model="client.paymentTerms"
-                class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:ring-1 focus:ring-primary/50 transition-all appearance-none"
-              >
-                <option value="due">Al recibir</option>
-                <option value="net15">Net 15 días</option>
-                <option value="net30">Net 30 días</option>
-                <option value="net60">Net 60 días</option>
-              </select>
+              />
             </div>
             <div class="space-y-2">
               <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
                 <Globe :size="14" />
                 Moneda de Facturación
               </label>
-              <select 
+              <CustomSelect 
+                :options="currencyOptions"
                 v-model="client.currency"
-                class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white outline-none focus:ring-1 focus:ring-primary/50 transition-all appearance-none"
-              >
-                <option value="EUR">Euro (€)</option>
-                <option value="USD">Dólar Estadounidense ($)</option>
-                <option value="MXN">Peso Mexicano ($)</option>
-                <option value="GBP">Libra Esterlina (£)</option>
-              </select>
+              />
             </div>
           </div>
         </div>
@@ -203,10 +228,10 @@ const handleSave = () => {
 
       <!-- Sidebar Summary -->
       <div class="space-y-6">
-        <div class="glass-panel p-8 rounded-[2rem] space-y-6 sticky top-24">
-          <div class="flex flex-col items-center text-center mb-8">
-            <div class="h-24 w-24 rounded-[2rem] bg-white/5 border border-white/10 flex items-center justify-center text-slate-600 mb-4 group cursor-pointer hover:bg-white/10 transition-all">
-              <Plus :size="32" class="group-hover:scale-110 transition-transform" />
+        <div class="glass-panel p-6 md:p-8 rounded-2xl md:rounded-[2rem] space-y-6 sticky top-24">
+          <div class="flex flex-col items-center text-center mb-6 md:mb-8">
+            <div class="h-20 w-20 md:h-24 md:w-24 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-600 mb-4 group cursor-pointer hover:bg-white/10 transition-all">
+              <Plus :size="28" class="group-hover:scale-110 transition-transform" />
             </div>
             <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Subir Logo / Avatar</p>
           </div>
@@ -225,7 +250,7 @@ const handleSave = () => {
             </button>
           </div>
 
-          <div class="mt-8 p-4 bg-primary/10 rounded-2xl border border-primary/20">
+          <div class="mt-6 md:mt-8 p-4 bg-primary/10 rounded-2xl border border-primary/20">
             <div class="flex gap-3">
               <Building2 class="text-primary shrink-0" :size="18" />
               <p class="text-[10px] text-primary font-medium leading-relaxed">
